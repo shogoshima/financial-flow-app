@@ -69,10 +69,4 @@ export class AuthService {
       loginAttempts
     });
   }
-
-  // Utility method for email validation
-  static isEmailValid(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
 }
