@@ -23,6 +23,19 @@ export class GoalService {
     return goals.map(goal => this.mapToModel(goal));
   }
 
+  static async getGoalById(id: string): Promise<Goal | null> {
+    const goal = await prisma.goal.findFirst({
+      where: {
+        id
+      }
+    });
+
+    if (!goal)
+      return null;
+
+    return this.mapToModel(goal);
+  }
+
   static async updateGoal(id: string, updatedFields: Partial<GoalBase>): Promise<Goal> {
     const goal = await prisma.goal.update({
       where: {

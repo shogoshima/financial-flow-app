@@ -1,11 +1,12 @@
+import { AuthService } from "@/services";
+
 export interface AuthBase {
   email: string,
-  password?: string
+  passwordHash: string,
 }
 
 export interface AuthModel extends AuthBase {
   id: string,
-  passwordHash: string,
   sessionToken: string | null,
   expiresAt: Date | null,
   lastLogin: Date | null,
@@ -13,7 +14,7 @@ export interface AuthModel extends AuthBase {
 }
 
 export class Auth {
-  private id: string;
+  public id: string;
   private email: string;
   private passwordHash: string;
   private sessionToken: string | null;
@@ -47,10 +48,6 @@ export class Auth {
   }
 
   // Setters
-  setEmail(email: string): void {
-    this.email = email;
-  }
-
   setSessionToken(token: string): void {
     this.sessionToken = token;
   }
@@ -76,5 +73,28 @@ export class Auth {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
-  
+
+  static isPasswordValid(password: string): boolean {
+    return password.length >= 8;
+  }
+
+  static async create(email: string, password: string): Promise<Auth> {
+    if (!Auth.isEmailValid(email))
+      throw new Error('Invalid email');
+
+    if (!Auth.isPasswordValid(password))
+      throw new Error('Invalid password');
+
+    const passwordHash = await AuthService.hashPassword(password);
+    const auth = await AuthService.createAuth({ email, passwordHash });
+
+    if (!auth) throw new Error('Could not create auth');
+
+    return auth;
+  }
+
+  static async update(id: string, updatedFields: Partial<AuthBase>): Promise<Auth> {
+    const auth = await AuthService.updateAuth(id, updatedFields);
+    return auth;
+  }
 }

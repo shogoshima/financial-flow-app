@@ -1,3 +1,5 @@
+import { PreferencesService } from "@/services"
+
 export enum themeType {
   LIGHT = 'light',
   DARK = 'dark'
@@ -36,11 +38,24 @@ export class Preferences {
     { userId, theme, notifications, language, currency }: PreferencesModel
   ) {
     this.userId = userId;
-    this.notifications = notifications;
     this.theme = theme ?? themeType.LIGHT;
+    this.notifications = notifications;
     this.language = language;
     this.currency = currency;
   }
 
-  
+  static async create(preferencesData: PreferencesBase): Promise<Preferences> {
+    const createdPreferences = await PreferencesService.createPreferences(preferencesData);
+    return createdPreferences;
+  }
+
+  static async getByUserId(userId: string): Promise<Preferences | null> {
+    const preferences = await PreferencesService.getPreferences(userId);
+    return preferences;
+  }
+
+  static async updateById(id: string, updatedFields: Partial<PreferencesModel>): Promise<Preferences> {
+    const updatedPreferences = await PreferencesService.updatePreferences(id, updatedFields);
+    return updatedPreferences;
+  }
 }

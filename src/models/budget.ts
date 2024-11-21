@@ -83,5 +83,19 @@ export class Budget {
   }
 
   // Methods
-  
+  static async create(userId: string, budget: BudgetBase): Promise<Budget> {
+    const newBudget = await BudgetService.createBudget(userId, budget);
+    return newBudget;
+  }
+
+  static async getByUserId(userId: string): Promise<Budget | null> {
+    const budget = await BudgetService.getBudget(userId);
+    if (!budget) return null;
+    return budget;
+  }
+
+  static async update(id: string, budget: Partial<BudgetBase>): Promise<Budget> {
+    const updatedBudget = await BudgetService.updateBudget(id, budget);
+    return updatedBudget;
+  }
 }

@@ -15,7 +15,7 @@ export class User {
   public readonly id: string;
   private name: string;
   private readonly cpf: string;
-  public avatar: string;
+  public avatar: string | null;
   private preferences: Preferences | null;
   private goals: Goal[];
   private transactions: Transaction[];
@@ -31,7 +31,7 @@ export class User {
     goals: Goal[],
     transactions: Transaction[],
     budget: Budget | null,
-    avatar: string,
+    avatar: string | null,
     auth: Auth,
   ) {
     this.id = id;
@@ -41,7 +41,7 @@ export class User {
     this.goals = goals;
     this.transactions = transactions;
     this.budget = budget;
-    this.avatar = avatar;
+    this.avatar = avatar ?? null;
     this.auth = auth;
   }
 
@@ -84,5 +84,23 @@ export class User {
 
   getGoals(): Goal[] {
     return this.goals;
+  }
+
+  // Static methods
+  /// Should not call this until the email is verified
+  static async create(name: string, cpf: string, email: string, password: string): Promise<User> {
+    const auth = await Auth.create(email, password);
+    const user = await UserService.createUser(name, cpf, auth.id);
+    return user;
+  }
+
+  static async getById(id: string): Promise<User | null> {
+    const user = await UserService.getUserById(id);
+    if (!user) return null;
+    return user;
+  }
+
+  static async update(id: string, params: { name?: string; cpf?: string; avatar?: string }): Promise<void> {
+    await UserService.updateUser(id, params);
   }
 }

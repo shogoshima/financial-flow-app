@@ -37,12 +37,11 @@ export class UserService {
     );
   }
 
-  static async createUser(name: string, cpf: string, avatar: string, authId: string): Promise<User> {
+  static async createUser(name: string, cpf: string, authId: string): Promise<User> {
     const user = await prisma.user.create({
       data: {
         name,
         cpf,
-        avatar,
         auth: {
           connect: {
             id: authId
@@ -62,7 +61,7 @@ export class UserService {
       [],
       [],
       null,
-      user.avatar,
+      null,
       AuthService.mapToModel(user.auth)
     );
   }

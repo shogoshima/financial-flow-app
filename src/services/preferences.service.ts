@@ -1,12 +1,11 @@
 import prisma from "@/bin/prisma";
-import { Preferences, languageType, themeType, currencyType } from "@/models/preferences";
+import { Preferences, PreferencesBase, languageType, themeType, currencyType } from "@/models/preferences";
 
 export class PreferencesService {
-  static async createPreferences(userId: string, preferencesData: Preferences): Promise<Preferences> {
+  static async createPreferences(preferencesData: PreferencesBase): Promise<Preferences> {
     const preferences = await prisma.preferences.create({
       data: {
         ...preferencesData,
-        userId
       }
     });
 

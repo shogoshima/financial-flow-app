@@ -5,14 +5,11 @@ import bcrypt from 'bcryptjs';
 
 export class AuthService {
   static async createAuth(authData: AuthBase): Promise<Auth | null> {
-    if (!authData.password) return null;
-
-    const hash = await bcrypt.hash(authData.password, 10);
+    if (!authData.passwordHash) return null;
 
     const auth = await prisma.auth.create({
       data: {
         ...authData,
-        passwordHash: hash
       }
     });
 
@@ -46,6 +43,10 @@ export class AuthService {
     });
 
     return this.mapToModel(auth);
+  }
+
+  static hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
   }
 
   static mapToModel({
