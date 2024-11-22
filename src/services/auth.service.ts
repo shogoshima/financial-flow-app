@@ -24,6 +24,8 @@ export class AuthService {
     });
 
     if (!auth) return null;
+    
+    if (!auth.emailVerified) return null;
 
     const isPasswordValid = await bcrypt.compare(password, auth.passwordHash);
 
@@ -50,11 +52,12 @@ export class AuthService {
   }
 
   static mapToModel({
-    id, email, passwordHash, sessionToken, expiresAt, lastLogin, loginAttempts
+    id, email, passwordHash, emailVerified, sessionToken, expiresAt, lastLogin, loginAttempts
   }: {
     id: string;
     email: string;
     passwordHash: string;
+    emailVerified: boolean;
     sessionToken: string | null;
     expiresAt: Date | null;
     lastLogin: Date | null;
@@ -64,6 +67,7 @@ export class AuthService {
       id,
       email,
       passwordHash,
+      emailVerified: emailVerified,
       sessionToken: sessionToken ? sessionToken : null,
       expiresAt: expiresAt ? expiresAt : null,
       lastLogin: lastLogin ? lastLogin : null,

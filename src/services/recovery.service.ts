@@ -4,7 +4,7 @@ import { Recovery } from "@/models/recovery";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export class RecoveryService {
-  static async createRecovery(userId: string): Promise<Recovery> {
+  static async createRecoveryToken(userId: string): Promise<Recovery> {
     const recoveryToken = Math.random().toString(36).substring(2, 7);
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
     const newRecovery = await prisma.recovery.create({
@@ -14,7 +14,7 @@ export class RecoveryService {
     return new Recovery(newRecovery);
   }
 
-  static async updateRecoveryToken(userId: string): Promise<Recovery> {
+  static async setRecoveryToken(userId: string): Promise<Recovery> {
     const recoveryToken = Math.random().toString(36).substring(2, 7);
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
     const updatedRecovery = await prisma.recovery.update({

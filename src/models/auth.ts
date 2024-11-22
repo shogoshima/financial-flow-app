@@ -7,6 +7,7 @@ export interface AuthBase {
 
 export interface AuthModel extends AuthBase {
   id: string,
+  emailVerified: boolean,
   sessionToken: string | null,
   expiresAt: Date | null,
   lastLogin: Date | null,
@@ -17,17 +18,19 @@ export class Auth {
   public id: string;
   private email: string;
   private passwordHash: string;
+  private emailVerified: boolean;
   private sessionToken: string | null;
   private expiresAt: Date | null;
   private lastLogin: Date | null;
   private loginAttempts: number;
 
   constructor(
-    { id, email, passwordHash, sessionToken, expiresAt, lastLogin, loginAttempts }: AuthModel
+    { id, email, passwordHash, emailVerified, sessionToken, expiresAt, lastLogin, loginAttempts }: AuthModel
   ) {
     this.id = id;
     this.email = email;
     this.passwordHash = passwordHash;
+    this.emailVerified = emailVerified;
     this.sessionToken = sessionToken;
     this.expiresAt = expiresAt;
     this.lastLogin = lastLogin;

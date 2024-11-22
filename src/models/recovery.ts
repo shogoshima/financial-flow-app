@@ -26,8 +26,19 @@ export class Recovery {
     this.expiresAt = expiresAt;
   }
 
+  getRecoveryToken(): string {
+    return this.recoveryToken;
+  }
+
+  // setters
+  async setRecoveryToken(recoveryToken: string): Promise<void> {
+    this.recoveryToken = recoveryToken;
+    await RecoveryService.setRecoveryToken(this.id);
+  }
+
+  // static
   static async createRecovery(userId: string,): Promise<Recovery> {
-    const recovery = await RecoveryService.createRecovery(userId);
+    const recovery = await RecoveryService.createRecoveryToken(userId);
     return recovery;
   }
 

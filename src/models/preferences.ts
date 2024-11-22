@@ -44,6 +44,12 @@ export class Preferences {
     this.currency = currency;
   }
 
+  async update(updatedFields: Partial<PreferencesModel>): Promise<Preferences> {
+    const updatedPreferences = await PreferencesService.updatePreferences(this.userId, updatedFields);
+    return updatedPreferences;
+  }
+
+  // static
   static async create(preferencesData: PreferencesBase): Promise<Preferences> {
     const createdPreferences = await PreferencesService.createPreferences(preferencesData);
     return createdPreferences;
@@ -52,10 +58,5 @@ export class Preferences {
   static async getByUserId(userId: string): Promise<Preferences | null> {
     const preferences = await PreferencesService.getPreferences(userId);
     return preferences;
-  }
-
-  static async updateById(id: string, updatedFields: Partial<PreferencesModel>): Promise<Preferences> {
-    const updatedPreferences = await PreferencesService.updatePreferences(id, updatedFields);
-    return updatedPreferences;
   }
 }

@@ -82,6 +82,12 @@ export class Goal {
     return goal;
   }
 
+  async update(updatedFields: Partial<GoalBase>): Promise<Goal> {
+    const goal = await GoalService.updateGoal(this.id, updatedFields);
+    return goal;
+  }
+
+  // static
   static async getManyByUserId(userId: string): Promise<Goal[]> {
     const goals = await GoalService.getGoals(userId);
     return goals;
@@ -93,8 +99,4 @@ export class Goal {
     return goal;
   }
 
-  static async update(id: string, updatedFields: Partial<GoalBase>): Promise<Goal> {
-    const goal = await GoalService.updateGoal(id, updatedFields);
-    return goal;
-  }
 }

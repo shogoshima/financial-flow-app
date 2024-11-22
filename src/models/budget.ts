@@ -82,7 +82,12 @@ export class Budget {
     BudgetService.updateBudget(this.id, { period });
   }
 
-  // Methods
+  async update(budget: Partial<BudgetBase>): Promise<Budget> {
+    const updatedBudget = await BudgetService.updateBudget(this.id, budget);
+    return updatedBudget;
+  }
+
+  // Static Methods
   static async create(userId: string, budget: BudgetBase): Promise<Budget> {
     const newBudget = await BudgetService.createBudget(userId, budget);
     return newBudget;
@@ -94,8 +99,4 @@ export class Budget {
     return budget;
   }
 
-  static async update(id: string, budget: Partial<BudgetBase>): Promise<Budget> {
-    const updatedBudget = await BudgetService.updateBudget(id, budget);
-    return updatedBudget;
-  }
 }

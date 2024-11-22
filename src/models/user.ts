@@ -50,40 +50,42 @@ export class User {
     return this.name;
   }
 
-  getCpf(): string {
-    return this.cpf;
-  }
-
-  getPreferences(): Preferences | null {
-    return this.preferences ? this.preferences : null;
-  }
-
-  async getUser(id: string): Promise<User | null> {
-    const user = await UserService.getUserById(id);
-    if (!user) return null;
-    return user;
-  }
-
   async setName(name: string): Promise<void> {
     this.name = name;
     await UserService.updateUser(this.id, { name });
   }
 
-  setPreferences(preferences: Preferences): void {
-    this.preferences = preferences;
+  getCpf(): string {
+    return this.cpf;
   }
 
-  // Goal related methods
+  getPreferences(): Preferences | null {
+    return this.preferences;
+  }
+
+  async updatePreferences(preferences: Preferences): Promise<void> {
+    this.preferences = preferences;
+    await PreferencesService.updatePreferences(this.id, preferences);
+  }
+
+  // Goal-related methods
   addGoal(goal: Goal): void {
     this.goals.push(goal);
   }
 
-  removeGoal(goalId: string): void {
+  async removeGoal(goalId: string): Promise<void> {
     this.goals = this.goals.filter(goal => goal.id !== goalId);
+    await GoalService.deleteGoal(goalId);
   }
 
   getGoals(): Goal[] {
     return this.goals;
+  }
+
+  async update(params: { name?: string; cpf?: string; avatar?: string }): Promise<void> {
+    if (params.name) this.name = params.name;
+    if (params.avatar) this.avatar = params.avatar;
+    await UserService.updateUser(this.id, params);
   }
 
   // Static methods
@@ -98,9 +100,5 @@ export class User {
     const user = await UserService.getUserById(id);
     if (!user) return null;
     return user;
-  }
-
-  static async update(id: string, params: { name?: string; cpf?: string; avatar?: string }): Promise<void> {
-    await UserService.updateUser(id, params);
   }
 }
