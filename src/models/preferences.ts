@@ -15,43 +15,36 @@ export enum currencyType {
   BRL = 'BRL'
 }
 
-export interface PreferencesBase {
-  userId: string
+export interface PreferencesModel {
   theme: themeType | null
   notifications: boolean
   language: languageType
   currency: currencyType
 }
 
-export interface PreferencesModel extends PreferencesBase {
-  id: string
-}
-
 export class Preferences {
-  public userId: string;
   public theme: themeType | null;
   public notifications: boolean;
   public language: languageType;
   public currency: currencyType;
 
   constructor(
-    { userId, theme, notifications, language, currency }: PreferencesModel
+    { theme, notifications, language, currency }: PreferencesModel
   ) {
-    this.userId = userId;
     this.theme = theme ?? themeType.LIGHT;
     this.notifications = notifications;
     this.language = language;
     this.currency = currency;
   }
 
-  async update(updatedFields: Partial<PreferencesModel>): Promise<Preferences> {
-    const updatedPreferences = await PreferencesService.updatePreferences(this.userId, updatedFields);
+  async update(userId: string, updatedFields: Partial<PreferencesModel>): Promise<Preferences> {
+    const updatedPreferences = await PreferencesService.updatePreferences(userId, updatedFields);
     return updatedPreferences;
   }
 
   // static
-  static async create(preferencesData: PreferencesBase): Promise<Preferences> {
-    const createdPreferences = await PreferencesService.createPreferences(preferencesData);
+  static async create(userId: string, preferencesData: PreferencesModel): Promise<Preferences> {
+    const createdPreferences = await PreferencesService.createPreferences(userId, preferencesData);
     return createdPreferences;
   }
 

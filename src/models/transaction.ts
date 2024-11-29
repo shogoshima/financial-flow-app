@@ -1,10 +1,13 @@
+import { TransactionService } from "@/services"
+
 export enum TransactionType {
   INVESTMENT = 'INVESTMENT',
   INCOME = 'INCOME',
   EXPENSE = 'EXPENSE',
 }
 
-export interface TransactionBase {
+export interface TransactionModel {
+  id: string
   type: TransactionType
   amount: number
   date: Date
@@ -12,22 +15,16 @@ export interface TransactionBase {
   category: string
 }
 
-export interface TransactionModel extends TransactionBase {
-  userId: string
-  id: string
-}
-
 export class Transaction {
   public id: string;
-  private type: TransactionType;
-  private amount: number;
-  private date: Date;
-  private description: string;
-  private category: string;
-  public userId: string;
+  public type: TransactionType;
+  public amount: number;
+  public date: Date;
+  public description: string;
+  public category: string;
 
   constructor({
-    id, type, amount, date, description, category, userId
+    id, type, amount, date, description, category
   }: TransactionModel
   ) {
     this.id = id;
@@ -36,30 +33,26 @@ export class Transaction {
     this.date = date;
     this.description = description;
     this.category = category;
-    this.userId = userId;
   }
 
-  // Getters
-  getType(): TransactionType {
-    return this.type;
+  getDetails() {
+    return {
+      id: this.id,
+      type: this.type,
+      amount: this.amount,
+      date: this.date,
+      description: this.description,
+      category: this.category
+    }
   }
 
-  getAmount(): number {
-    return this.amount;
+  async update(updatedFields: Partial<TransactionModel>): Promise<void> {
+    this.type = updatedFields.type ?? this.type;
+    this.amount = updatedFields.amount ?? this.amount;
+    this.date = updatedFields.date ?? this.date;
+    this.description = updatedFields.description ?? this.description;
+    this.category = updatedFields.category ?? this.category;
+
+    await TransactionService.updateTransaction(this.id, updatedFields);
   }
-
-  getDate(): Date {
-    return this.date;
-  }
-
-  getDescription(): string {
-    return this.description;
-  }
-
-  getCategory(): string {
-    return this.category;
-  }
-
-  // Setters
-
 }

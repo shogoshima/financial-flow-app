@@ -1,8 +1,8 @@
 import prisma from "@/bin/prisma";
-import { Goal, GoalBase, GoalModel, GoalStatus, GoalType } from "@/models/goal";
+import { Goal, GoalModel, GoalStatus, GoalType } from "@/models/goal";
 
 export class GoalService {
-  static async createGoal(userId: string, goalData: GoalBase): Promise<Goal> {
+  static async createGoal(userId: string, goalData: Omit<GoalModel, 'id'>): Promise<Goal> {
     const goal = await prisma.goal.create({
       data: {
         ...goalData,
@@ -36,7 +36,7 @@ export class GoalService {
     return this.mapToModel(goal);
   }
 
-  static async updateGoal(id: string, updatedFields: Partial<GoalBase>): Promise<Goal> {
+  static async updateGoal(id: string, updatedFields: Partial<GoalModel>): Promise<Goal> {
     const goal = await prisma.goal.update({
       where: {
         id
@@ -78,7 +78,6 @@ export class GoalService {
       deadline,
       type: GoalType[type as keyof typeof GoalType],
       status: GoalStatus[status as keyof typeof GoalStatus],
-      userId
     })
   }
 }

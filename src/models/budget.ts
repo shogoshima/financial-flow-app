@@ -8,87 +8,30 @@ export enum BudgetPeriod {
   CUSTOM = 'CUSTOM'
 }
 
-export interface BudgetBase {
-  totalIncome: number
-  totalExpenses: number
-  limit: number
-  period: BudgetPeriod
-}
-
-export interface BudgetModel extends BudgetBase {
-  userId: string
+export interface BudgetModel {
+  limit: number,
   id: string
 }
 
 export class Budget {
   public id: string;
-  private totalIncome: number;
-  private totalExpenses: number;
   public limit: number;
-  private userId: string;
-  private period: BudgetPeriod;
 
   constructor({
-    id, totalIncome, totalExpenses, limit, userId, period
+    id, limit
   }: BudgetModel
   ) {
     this.id = id;
-    this.totalIncome = totalIncome;
-    this.totalExpenses = totalExpenses;
-    this.limit = limit;
-    this.userId = userId;
-    this.period = period;
+    this.limit = limit
   }
 
-  // Getters
-  getTotalIncome(): number {
-    return this.totalIncome;
-  }
-
-  getTotalExpenses(): number {
-    return this.totalExpenses;
-  }
-
-  getLimit(): number {
-    return this.limit;
-  }
-
-  getUserId(): string {
-    return this.userId;
-  }
-
-  getPeriod(): BudgetPeriod {
-    return this.period;
-  }
-
-  // Setters
-  setTotalIncome(income: number): void {
-    this.totalIncome = income;
-    BudgetService.updateBudget(this.id, { totalIncome: income });
-  }
-
-  setTotalExpenses(expenses: number): void {
-    this.totalExpenses = expenses;
-    BudgetService.updateBudget(this.id, { totalExpenses: expenses });
-  }
-
-  setLimit(limit: number): void {
-    this.limit = limit;
-    BudgetService.updateBudget(this.id, { limit });
-  }
-
-  setPeriod(period: BudgetPeriod): void {
-    this.period = period;
-    BudgetService.updateBudget(this.id, { period });
-  }
-
-  async update(budget: Partial<BudgetBase>): Promise<Budget> {
-    const updatedBudget = await BudgetService.updateBudget(this.id, budget);
+  async setLimit(limit: number): Promise<Budget> {
+    const updatedBudget = await BudgetService.updateBudget(this.id, { limit });
     return updatedBudget;
   }
 
   // Static Methods
-  static async create(userId: string, budget: BudgetBase): Promise<Budget> {
+  static async create(userId: string, budget: BudgetModel): Promise<Budget> {
     const newBudget = await BudgetService.createBudget(userId, budget);
     return newBudget;
   }
@@ -98,5 +41,4 @@ export class Budget {
     if (!budget) return null;
     return budget;
   }
-
 }

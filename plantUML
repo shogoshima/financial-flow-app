@@ -1,0 +1,114 @@
+@startuml
+top to bottom direction
+
+class User {
+    + UUID id
+    - string name
+    - string cpf
+    + string avatar
+    + Preferences preferences
+    + array<Goal> goals
+    + History history
+    + Budget budget
+    --
+    + getName(): string
+    + setName(name: string): void
+    + getCpf(): string
+    + addGoal(goal: Goal): void
+    + removeGoal(goalId: UUID): void
+    + getGoals(): array<Goal>
+    + updateProfile(params: { name?: string; avatar?: string }): void
+}
+
+class Auth {
+    + UUID id
+    + string email
+    + string passwordHash
+    + boolean emailVerified
+    + string sessionToken
+    + timestamp lastLogin
+    + integer loginAttempts
+    --
+    + validatePassword(password: string): bool
+    + generateToken(): string
+    + updateSession(token: string): void
+    + invalidateSession(): void
+}
+
+class Goal {
+    + UUID id
+    + string name
+    + float targetAmount
+    + float currentAmount
+    + date deadline
+    + enum type
+    + enum status
+    + timestamp createdAt
+    --
+    + updateProgress(float amount): void
+    + cancelGoal(): void
+    + completeGoal(): void
+}
+
+class Transaction {
+    + UUID id
+    + enum type
+    + float amount
+    + date date
+    + string description
+    + string category
+    --
+    + getDetails(): string
+    + update(): void
+}
+
+class Budget {
+    + UUID id
+    + float limit
+    --
+    + setLimit(float limit): void
+    + calculateRemainingBudget(): float
+}
+
+class Preferences {
+    + boolean notifications
+    + string language
+    + string currency
+    + string theme
+    --
+    + updatePreferences(boolean notifications, string language, string currency, string theme): void
+}
+
+class History {
+    + UUID id
+    + array<Transaction> transactions
+    + date startDate
+    + date endDate
+    + float totalIncome
+    + float totalExpenses
+    + float netSavings
+    --
+    + addTransaction(transaction: Transaction): void
+    + filterTransactions(string category, date startDate, date endDate): array<Transaction>
+    + generateSummary(): string
+}
+
+class Recovery {
+    + UUID userId
+    + string recoveryToken
+    + timestamp expiresAt
+    --
+    + createToken(UUID userId): string
+    + validateToken(string token): bool
+    + resetPassword(string token, string newPassword): void
+    + sendToken(string email): void
+}
+
+User o-- Auth : "1"
+User "1" --> "0..*" Goal : manages
+User "1" o-- "0..1" Budget : has
+User o-- History : "1" has
+User "1" -- "0..1" Recovery : can request
+Preferences -- User : "0..1" uses
+Goal "0..*" <-- "0..*" Transaction : tracks
+History "1" -- "0..*" Transaction : logs

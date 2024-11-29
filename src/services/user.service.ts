@@ -1,6 +1,7 @@
-import { Auth, Budget, Goal, Preferences, Transaction, User } from "@/models";
+import { Auth, History, Budget, Goal, Preferences, Transaction, User } from "@/models";
 import { BudgetService, GoalService, PreferencesService, TransactionService, AuthService } from ".";
 import prisma from "@/bin/prisma";
+import { HistoryService } from "./history.service";
 
 export class UserService {
   static async getUserById(id: string): Promise<User | null> {
@@ -15,9 +16,8 @@ export class UserService {
         avatar: true,
         preferences: true,
         goals: true,
-        transactions: true,
+        history: true,
         budget: true,
-        auth: true
       }
     });
 
@@ -28,29 +28,19 @@ export class UserService {
       id,
       user.name,
       user.cpf,
+      user.avatar,
       user.preferences ? PreferencesService.mapToModel(user.preferences) : null,
       user.goals.map(goal => GoalService.mapToModel(goal)),
-      user.transactions.map(transaction => TransactionService.mapToModel(transaction)),
       user.budget ? BudgetService.mapToModel(user.budget) : null,
-      user.avatar,
-      new Auth(user.auth)
     );
   }
 
-  static async createUser(name: string, cpf: string, authId: string): Promise<User> {
+  static async createUser(name: string, cpf: string): Promise<User> {
     const user = await prisma.user.create({
       data: {
         name,
         cpf,
-        auth: {
-          connect: {
-            id: authId
-          }
-        }
       },
-      include: {
-        auth: true,
-      }
     });
 
     return new User(
@@ -58,11 +48,9 @@ export class UserService {
       user.name,
       user.cpf,
       null,
-      [],
+      null,
       [],
       null,
-      null,
-      AuthService.mapToModel(user.auth)
     );
   }
 

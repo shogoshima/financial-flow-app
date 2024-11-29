@@ -1,10 +1,11 @@
 import prisma from "@/bin/prisma";
-import { Preferences, PreferencesBase, languageType, themeType, currencyType } from "@/models/preferences";
+import { Preferences, PreferencesModel, languageType, themeType, currencyType } from "@/models/preferences";
 
 export class PreferencesService {
-  static async createPreferences(preferencesData: PreferencesBase): Promise<Preferences> {
+  static async createPreferences(userId: string, preferencesData: PreferencesModel): Promise<Preferences> {
     const preferences = await prisma.preferences.create({
       data: {
+        userId,
         ...preferencesData,
       }
     });
@@ -39,18 +40,14 @@ export class PreferencesService {
   }
 
   static mapToModel({
-    id, userId, currency, language, theme, notifications
+    currency, language, theme, notifications
   }: {
-    id: string;
-    userId: string;
     currency: string;
     language: string;
     theme: string | null;
     notifications: boolean;
   }): Preferences {
     return new Preferences({
-      id,
-      userId,
       currency: currencyType[currency as keyof typeof currencyType],
       language: languageType[language as keyof typeof languageType],
       theme: theme ? themeType[theme as keyof typeof themeType] : themeType.LIGHT,

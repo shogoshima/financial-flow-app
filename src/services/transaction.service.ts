@@ -1,29 +1,42 @@
-import { Transaction, TransactionBase, TransactionType } from "@/models/transaction";
+import { Transaction, TransactionModel, TransactionType } from "@/models/transaction";
 import prisma from "@/bin/prisma";
 
 export class TransactionService {
-  static async createTransaction(userId: string, transactionData: TransactionBase): Promise<Transaction> {
+  static async createTransaction(historyId: string, transactionData: Omit<TransactionModel, 'id'>): Promise<Transaction> {
     const transaction = await prisma.transaction.create({
       data: {
         ...transactionData,
-        userId
+        historyId
       }
     });
 
     return this.mapToModel(transaction);
   }
 
-  static async getTransactions(userId: string): Promise<Transaction[]> {
+  static async getTransactions(historyId: string): Promise<Transaction[]> {
     const transactions = await prisma.transaction.findMany({
       where: {
-        userId
+        historyId
       }
     });
 
     return transactions.map(transaction => this.mapToModel(transaction));
   }
 
-  static async updateTransaction(id: string, updatedFields: Partial<TransactionBase>): Promise<Transaction> {
+  static async getFilteredTransactions({ startDate, endDate }: { startDate?: Date, endDate?: Date }) {
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        date: {
+          gte: startDate,
+          lte: endDate,
+        }
+      }
+    })
+
+    return transactions.map(transaction => this.mapToModel(transaction));
+  }
+
+  static async updateTransaction(id: string, updatedFields: Partial<TransactionModel>): Promise<Transaction> {
     const transaction = await prisma.transaction.update({
       where: {
         id
@@ -45,7 +58,7 @@ export class TransactionService {
   }
 
   static mapToModel({
-    id, type, amount, date, description, category, userId
+    id, type, amount, date, description, category
   }: {
     id: string;
     type: string;
@@ -53,7 +66,6 @@ export class TransactionService {
     date: Date;
     description: string;
     category: string;
-    userId: string
   }): Transaction {
     return new Transaction({
       id,
@@ -62,7 +74,6 @@ export class TransactionService {
       date,
       description,
       category,
-      userId
     });
   };
 }

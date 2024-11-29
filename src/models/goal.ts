@@ -12,32 +12,29 @@ export enum GoalStatus {
   FAILED = 'FAILED',
 }
 
-export interface GoalBase {
+export interface GoalModel {
+  id: string;
   name: string;
   targetAmount: number;
   currentAmount: number;
   deadline: Date;
   type: GoalType;
   status: GoalStatus;
-}
-
-export interface GoalModel extends GoalBase {
-  userId: string;
-  id: string;
+  createdAt?: Date;
 }
 
 export class Goal {
   public id: string;
   public name: string;
-  private targetAmount: number;
-  private currentAmount: number;
-  private deadline: Date;
-  private type: GoalType;
-  private status: GoalStatus;
-  private userId: string;
+  public targetAmount: number;
+  public currentAmount: number;
+  public deadline: Date;
+  public type: GoalType;
+  public status: GoalStatus;
+  public createdAt?: Date;
 
   constructor({
-    id, name, targetAmount, currentAmount, deadline, type, status, userId
+    id, name, targetAmount, currentAmount, deadline, type, status, createdAt
   }: GoalModel) {
     this.id = id;
     this.name = name;
@@ -46,48 +43,32 @@ export class Goal {
     this.deadline = deadline;
     this.type = type;
     this.status = status;
-    this.userId = userId;
-  }
-
-  // Getters
-  getName(): string {
-    return this.name;
-  }
-
-  getTargetAmount(): number {
-    return this.targetAmount;
-  }
-
-  getCurrentAmount(): number {
-    return this.currentAmount;
-  }
-
-  getDeadline(): Date {
-    return this.deadline;
-  }
-
-  getType(): GoalType {
-    return this.type;
-  }
-
-  getStatus(): GoalStatus {
-    return this.status;
+    this.createdAt = createdAt ?? new Date();
   }
 
   // Static methods
-  static async create(userId: string, {
-    name, targetAmount, currentAmount, deadline, type, status
-  }: GoalBase): Promise<Goal> {
-    const goal = await GoalService.createGoal(userId, { name, targetAmount, currentAmount, deadline, type, status });
-    return goal;
-  }
 
-  async update(updatedFields: Partial<GoalBase>): Promise<Goal> {
+  async updateProgress(updatedFields: Partial<GoalModel>): Promise<Goal> {
     const goal = await GoalService.updateGoal(this.id, updatedFields);
     return goal;
   }
 
+  async cancelGoal(): Promise<void> {
+    await this.updateProgress({ status: GoalStatus.FAILED });
+  }
+
+  async completeGoal(): Promise<void> {
+    await this.updateProgress({ status: GoalStatus.COMPLETED });
+  }
+
   // static
+  static async create(userId: string, {
+    name, targetAmount, currentAmount, deadline, type, status
+  }: GoalModel): Promise<Goal> {
+    const goal = await GoalService.createGoal(userId, { name, targetAmount, currentAmount, deadline, type, status });
+    return goal;
+  }
+
   static async getManyByUserId(userId: string): Promise<Goal[]> {
     const goals = await GoalService.getGoals(userId);
     return goals;
@@ -98,5 +79,4 @@ export class Goal {
     if (!goal) return null;
     return goal;
   }
-
 }

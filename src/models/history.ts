@@ -1,64 +1,77 @@
 import { HistoryService } from '@/services/history.service';
 import { Transaction, TransactionType, TransactionModel } from './transaction';
+import { TransactionService } from '@/services';
 
 export interface HistoryModel {
-  type: TransactionType
+  id: string
+  transactions: Transaction[]
   startDate: Date
   endDate: Date
   totalIncome: number
   totalExpenses: number
   netSavings: number
-  transactions: TransactionModel[]
 }
 
 export class History {
-  private type: TransactionType;
+  public id: string;
+  public transactions: Transaction[];
   public startDate: Date;
   public endDate: Date;
-  private totalIncome: number = 0;
-  private totalExpenses: number = 0;
-  private netSavings: number = 0;
-  private transactions: Transaction[] = [];
+  public totalIncome: number;
+  public totalExpenses: number;
+  public netSavings: number;
 
-  constructor(
-    type: TransactionType,
-    startDate: Date,
-    endDate: Date,
+  constructor({
+    id, transactions, startDate, endDate, totalIncome, totalExpenses, netSavings
+  }: HistoryModel
   ) {
-    this.type = type;
+    this.id = id;
+    this.transactions = transactions;
     this.startDate = startDate;
     this.endDate = endDate;
+    this.totalIncome = totalIncome;
+    this.totalExpenses = totalExpenses;
+    this.netSavings = netSavings;
   }
-  
+
   // Getters
   getTotalIncome(): number {
     return this.totalIncome;
   }
-  
+
   getTotalExpenses(): number {
     return this.totalExpenses;
   }
-  
+
   getNetSavings(): number {
     return this.netSavings;
   }
 
   // Methods
-  async fetchHistory(): Promise<Transaction[]> {
-    const history = await HistoryService.fetchHistory(this.type, this.startDate, this.endDate);
-    return this.transactions = history;
+  addTransaction(transaction: Transaction): void {
+    this.transactions.push(transaction);
   }
 
-  async calculateNumbers(): Promise<void> {
-    await this.fetchHistory();
-    this.transactions.forEach(transaction => {
-      if (transaction.getType() === TransactionType.INCOME) {
-        this.totalIncome += transaction.getAmount();
-      } else {
-        this.totalExpenses += transaction.getAmount();
-      }
-    });
+  async filterHistory({ startDate, endDate }: { startDate?: Date, endDate?: Date }): Promise<void> {
+    const filteredTransactions = await TransactionService.getFilteredTransactions({ startDate, endDate });
 
-    this.netSavings = this.totalIncome - this.totalExpenses;
+    this.transactions = filteredTransactions;
+    this.startDate = startDate ?? this.startDate;
+    this.endDate = endDate ?? this.endDate;
+
+    this.totalExpenses = 0;
+    this.totalIncome = 0;
+    this.netSavings = 0;
+    filteredTransactions.map((transaction: Transaction) => {
+      if (transaction.type == TransactionType.EXPENSE) this.totalExpenses += transaction.amount;
+      else if (transaction.type === TransactionType.INCOME) this.totalIncome += transaction.amount;
+      else this.netSavings += transaction.amount;
+    })
+
+    this.netSavings += this.totalIncome - this.totalExpenses;
+  }
+
+  generateSummary(): string {
+    return `Summary: ${this.totalIncome} in income, ${this.totalExpenses} in expenses, ${this.netSavings} in net savings.`;
   }
 }

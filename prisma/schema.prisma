@@ -8,20 +8,19 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(cuid()) // Unique ID for the user
-  name         String
-  cpf          String        @unique // Brazilian Taxpayer ID
-  avatar       String?
-  createdAt    DateTime      @default(now()) // Date when user was created
-  updatedAt    DateTime      @updatedAt // Date when user was last updated
-  preferences  Preferences?
-  goals        Goal[]
-  transactions Transaction[]
-  budget       Budget?
-  recovery     Recovery?
+  id          String       @id @default(cuid()) // Unique ID for the user
+  name        String
+  cpf         String       @unique // Brazilian Taxpayer ID
+  avatar      String?
+  createdAt   DateTime     @default(now()) // Date when user was created
+  updatedAt   DateTime     @updatedAt // Date when user was last updated
+  preferences Preferences? // One-to-one optional relation with Preferences
+  goals       Goal[] // One-to-many relation with Goal
+  budget      Budget? // One-to-one optional relation with Budget
+  recovery    Recovery? // One-to-one optional relation with Recovery
 
-  authId String @unique
-  auth   Auth   @relation(fields: [authId], references: [id]) // One-to-one mandatory relation
+  history History? // One-to-one optional relation with History
+  auth    Auth? // One-to-one optional relation with Auth
 }
 
 model Preferences {
@@ -50,15 +49,15 @@ model Goal {
 
 model Auth {
   id            String    @id @default(cuid()) // Unique ID for authentication
-  email         String    @unique // User email, should be the same as User.email
+  email         String    @unique // User email
   emailVerified Boolean   @default(false) // Email verification status
   passwordHash  String // Hashed password for the user
-  sessionToken  String? // Session token (could be null if not logged in)
-  expiresAt     DateTime? // Expiration date for session
+  jwtToken      String? // Session token (could be null if not logged in)
   lastLogin     DateTime? @default(now()) // Last login date
   loginAttempts Int       @default(0) // Number of failed login attempts
 
-  user User?
+  userId String @unique // Reference to the user
+  user   User   @relation(fields: [userId], references: [id]) // Link to user
 }
 
 model Recovery {
@@ -78,17 +77,27 @@ model Transaction {
   description String // Description of the transaction
   category    String // Category of the transaction
 
-  userId String // Reference to the user
-  user   User   @relation(fields: [userId], references: [id]) // Link to user
+  historyId String? // Reference to history
+  history   History? @relation(fields: [historyId], references: [id]) // Link to history
 }
 
 model Budget {
-  id            String @id @default(cuid()) // Unique ID for the budget
-  totalIncome   Float // Total income for the budget
-  totalExpenses Float // Total expenses for the budget
-  limit         Float // Budget limit
-  period        String
+  id    String @id @default(cuid()) // Unique ID for the budget
+  limit Float // Budget limit
 
   userId String @unique // Reference to the user
   user   User   @relation(fields: [userId], references: [id]) // Link to user
+}
+
+model History {
+  id            String        @id @default(cuid()) // Unique ID for the history
+  startDate     DateTime // Start date of the history
+  endDate       DateTime // End date of the history
+  totalIncome   Float         @default(0) // Total income recorded
+  totalExpenses Float         @default(0) // Total expenses recorded
+  netSavings    Float         @default(0) // Net savings calculated
+  transactions  Transaction[] // One-to-many relation with Transaction
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id]) // One-to-one mandatory relation with History
 }
