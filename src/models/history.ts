@@ -4,7 +4,6 @@ import { TransactionService } from '@/services';
 
 export interface HistoryModel {
   id: string
-  transactions: Transaction[]
   startDate: Date
   endDate: Date
   totalIncome: number
@@ -14,7 +13,6 @@ export interface HistoryModel {
 
 export class History {
   public id: string;
-  public transactions: Transaction[];
   public startDate: Date;
   public endDate: Date;
   public totalIncome: number;
@@ -22,11 +20,10 @@ export class History {
   public netSavings: number;
 
   constructor({
-    id, transactions, startDate, endDate, totalIncome, totalExpenses, netSavings
+    id, startDate, endDate, totalIncome, totalExpenses, netSavings
   }: HistoryModel
   ) {
     this.id = id;
-    this.transactions = transactions;
     this.startDate = startDate;
     this.endDate = endDate;
     this.totalIncome = totalIncome;
@@ -48,14 +45,15 @@ export class History {
   }
 
   // Methods
-  addTransaction(transaction: Transaction): void {
-    this.transactions.push(transaction);
+  async addTransaction(transaction: Transaction): Promise<void> {
+    await TransactionService.createTransaction(this.id, transaction);
+    await this.filterHistory({});
   }
 
-  async filterHistory({ startDate, endDate }: { startDate?: Date, endDate?: Date }): Promise<void> {
+  async filterHistory({ startDate, endDate }: { startDate?: Date, endDate?: Date }): Promise<Transaction[]> {
     const filteredTransactions = await TransactionService.getFilteredTransactions({ startDate, endDate });
 
-    this.transactions = filteredTransactions;
+    const transactions: Transaction[] = filteredTransactions.map((transaction: TransactionModel) => TransactionService.mapToModel(transaction));
     this.startDate = startDate ?? this.startDate;
     this.endDate = endDate ?? this.endDate;
 
@@ -69,9 +67,26 @@ export class History {
     })
 
     this.netSavings += this.totalIncome - this.totalExpenses;
+
+    await HistoryService.updateHistory(this.id, {
+      startDate: this.startDate,
+      endDate: this.endDate,
+      totalIncome: this.totalIncome,
+      totalExpenses: this.totalExpenses,
+      netSavings: this.netSavings,
+    });
+
+    return transactions;
   }
 
   generateSummary(): string {
     return `Summary: ${this.totalIncome} in income, ${this.totalExpenses} in expenses, ${this.netSavings} in net savings.`;
+  }
+
+  // Static Methods
+  static async getLastSavedHistory(userId: string): Promise<History | null> {
+    const history = await HistoryService.getHistoryByUserId(userId);
+    if (!history) return null;
+    return history;
   }
 }

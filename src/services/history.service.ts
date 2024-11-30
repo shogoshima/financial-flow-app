@@ -18,7 +18,6 @@ export class HistoryService {
 
     return this.mapToModel({
       ...history,
-      transactions: [],
     });
   }
 
@@ -35,15 +34,26 @@ export class HistoryService {
     if (!history) return null;
     return this.mapToModel({
       ...history,
-      transactions: history.transactions.map(transaction => TransactionService.mapToModel(transaction))
     });
   }
 
+  static async updateHistory(id: string, updatedFields: Partial<History>): Promise<History> {
+    const history = await prisma.history.update({
+      where: {
+        id
+      },
+      data: {
+        ...updatedFields,
+      }
+    });
+
+    return this.mapToModel(history);
+  }
+
   static mapToModel({
-    id, transactions, startDate, endDate, totalIncome, totalExpenses, netSavings
+    id, startDate, endDate, totalIncome, totalExpenses, netSavings
   }: {
     id: string,
-    transactions: Transaction[]
     startDate: Date,
     endDate: Date,
     totalIncome: number,
@@ -52,7 +62,6 @@ export class HistoryService {
   }): History {
     return new History({
       id,
-      transactions,
       startDate,
       endDate,
       totalIncome,

@@ -47,7 +47,6 @@ export class Goal {
   }
 
   // Static methods
-
   async updateProgress(updatedFields: Partial<GoalModel>): Promise<Goal> {
     const goal = await GoalService.updateGoal(this.id, updatedFields);
     return goal;
@@ -64,7 +63,7 @@ export class Goal {
   // static
   static async create(userId: string, {
     name, targetAmount, currentAmount, deadline, type, status
-  }: GoalModel): Promise<Goal> {
+  }: Omit<GoalModel, "id">): Promise<Goal> {
     const goal = await GoalService.createGoal(userId, { name, targetAmount, currentAmount, deadline, type, status });
     return goal;
   }

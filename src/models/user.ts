@@ -44,27 +44,8 @@ export class User {
     return this.name;
   }
 
-  async setName(name: string): Promise<void> {
-    this.name = name;
-    await UserService.updateUser(this.id, { name });
-  }
-
   getCpf(): string {
     return this.cpf;
-  }
-
-  // Goal-related methods
-  addGoal(goal: Goal): void {
-    this.goals.push(goal);
-  }
-
-  async removeGoal(goalId: string): Promise<void> {
-    this.goals = this.goals.filter(goal => goal.id !== goalId);
-    await GoalService.deleteGoal(goalId);
-  }
-
-  getGoals(): Goal[] {
-    return this.goals;
   }
 
   async updateProfile(params: { name?: string; cpf?: string; avatar?: string }): Promise<void> {

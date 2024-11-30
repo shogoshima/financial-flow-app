@@ -30,6 +30,12 @@ export class Budget {
     return updatedBudget;
   }
 
+  async calculateRemaining(userId: string): Promise<number> {
+    const budget = await BudgetService.getBudget(userId);
+    if (!budget) return 0;
+    return budget.limit;
+  }
+
   // Static Methods
   static async create(userId: string, budget: BudgetModel): Promise<Budget> {
     const newBudget = await BudgetService.createBudget(userId, budget);

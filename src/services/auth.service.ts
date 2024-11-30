@@ -4,6 +4,18 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from 'bcryptjs';
 
 export class AuthService {
+  static async getAuth(userId: string): Promise<Auth | null> {
+    const auth = await prisma.auth.findUnique({
+      where: {
+        userId
+      }
+    });
+
+    if (!auth) return null;
+
+    return this.mapToModel(auth);
+  }
+
   static async createCredentials(userId: string, email: string, password: string): Promise<Auth | null> {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,22 +42,9 @@ export class AuthService {
     return this.mapToModel(auth);
   }
 
-  static async verifyCredentials(email: string, password: string): Promise<Auth | null> {
-    const auth = await prisma.auth.findUnique({
-      where: {
-        email
-      }
-    });
-
-    if (!auth) return null;
-
-    if (!auth.emailVerified) return null;
-
-    const isPasswordValid = await bcrypt.compare(password, auth.passwordHash);
-
-    if (!isPasswordValid) return null;
-
-    return this.mapToModel(auth);
+  static async verifyCredentials(password: string, passwordHash: string): Promise<boolean> {
+    const isPasswordValid = await bcrypt.compare(password, passwordHash);
+    return isPasswordValid;
   }
 
   static async updateAuth(authId: string, updatedFields: Partial<AuthModel>): Promise<Auth> {
@@ -68,10 +67,11 @@ export class AuthService {
     return token;
   }
 
-  static verifySession(token: string): JwtPayload | null {
+  static verifySession(token: string): string | null {
     try {
       const secret = process.env.JWT_SECRET!;
-      return jwt.verify(token, secret) as JwtPayload;
+      const payload = jwt.verify(token, secret) as JwtPayload;
+      return payload.authId || null;
     } catch (err) {
       return null;
     }
@@ -82,7 +82,7 @@ export class AuthService {
   }
 
   static mapToModel({
-    id, email, passwordHash, emailVerified, jwtToken, lastLogin, loginAttempts
+    id, email, passwordHash, emailVerified, jwtToken, lastLogin, loginAttempts, userId
   }: {
     id: string;
     email: string;
@@ -91,6 +91,7 @@ export class AuthService {
     jwtToken: string | null;
     lastLogin: Date | null;
     loginAttempts: number;
+    userId: string;
   }): Auth {
     return new Auth({
       id,
@@ -99,7 +100,8 @@ export class AuthService {
       emailVerified: emailVerified,
       jwtToken: jwtToken ? jwtToken : null,
       lastLogin: lastLogin ? lastLogin : null,
-      loginAttempts
+      loginAttempts,
+      userId
     });
   }
 }

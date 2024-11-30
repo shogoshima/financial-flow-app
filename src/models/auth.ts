@@ -8,31 +8,40 @@ export interface AuthModel {
   jwtToken: string | null,
   lastLogin: Date | null,
   loginAttempts: number
+  userId: string
 }
 
 export class Auth {
   public id: string;
-  public email: string;
-  public passwordHash: string;
-  public jwtToken: string | null;
+  private email: string;
+  private passwordHash: string;
+  public emailVerified: boolean;
+  private jwtToken: string | null;
   public lastLogin: Date | null;
   public loginAttempts: number;
+  private userId: string;
 
   constructor(
-    { id, email, passwordHash, emailVerified, jwtToken, lastLogin, loginAttempts }: AuthModel
+    { id, email, passwordHash, emailVerified, jwtToken, lastLogin, loginAttempts, userId }: AuthModel
   ) {
     this.id = id;
     this.email = email;
     this.passwordHash = passwordHash;
+    this.emailVerified = emailVerified;
     this.jwtToken = jwtToken;
     this.lastLogin = lastLogin;
     this.loginAttempts = loginAttempts;
+    this.userId = userId;
   }
 
   // Methods
   async validatePassword(password: string): Promise<boolean> {
-    const auth = AuthService.verifyCredentials(this.email, password);
-    if (!auth) return false;
+    const auth = await AuthService.verifyCredentials(password, this.passwordHash);
+    if (!auth) {
+      this.loginAttempts += 1;
+      await AuthService.updateAuth(this.id, { loginAttempts: this.loginAttempts });
+      return false;
+    };
     return true;
   }
 
@@ -41,7 +50,7 @@ export class Auth {
   }
 
   async updateSession(token: string): Promise<void> {
-    await AuthService.updateAuth(this.id, { jwtToken: token });
+    await AuthService.updateAuth(this.id, { jwtToken: token, lastLogin: new Date() });
   }
 
   async invalidateSession(): Promise<void> {
@@ -52,5 +61,18 @@ export class Auth {
   static async update(id: string, updatedFields: Partial<AuthModel>): Promise<Auth> {
     const auth = await AuthService.updateAuth(id, updatedFields);
     return auth;
+  }
+
+  static async get(authId: string): Promise<Auth | null> {
+    const auth = await AuthService.getAuth(authId);
+
+    if (!auth) return null;
+    return auth;
+  }
+
+  static async session(token: string): Promise<string | null> {
+    const authId = AuthService.verifySession(token);
+    if (!authId) return null;
+    return authId;
   }
 }

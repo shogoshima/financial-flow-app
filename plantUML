@@ -7,12 +7,11 @@ class User {
     - string cpf
     + string avatar
     + Preferences preferences
-    + array<Goal> goals
+    - array<Goal> goals
     + History history
     + Budget budget
     --
     + getName(): string
-    + setName(name: string): void
     + getCpf(): string
     + addGoal(goal: Goal): void
     + removeGoal(goalId: UUID): void

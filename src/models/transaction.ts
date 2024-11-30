@@ -1,4 +1,5 @@
-import { TransactionService } from "@/services"
+import { TransactionService } from "@/services";
+import { History } from "@/models";
 
 export enum TransactionType {
   INVESTMENT = 'INVESTMENT',
