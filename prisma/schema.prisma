@@ -4,13 +4,13 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:postgres@postgres:5432/postgres?schema=public"
 }
 
 model User {
   id          String       @id @default(cuid()) // Unique ID for the user
   name        String
-  cpf         String       @unique // Brazilian Taxpayer ID
+  cpf         String?       @unique // Brazilian Taxpayer ID
   avatar      String?
   createdAt   DateTime     @default(now()) // Date when user was created
   updatedAt   DateTime     @updatedAt // Date when user was last updated

@@ -1,7 +1,7 @@
 import prisma from "@/bin/prisma";
 import { Resend } from "resend";
 import { Recovery } from "@/models/recovery";
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend("api_key");
 
 export class RecoveryService {
   static async createRecoveryToken(userId: string): Promise<Recovery> {

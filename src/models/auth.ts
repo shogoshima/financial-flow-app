@@ -19,7 +19,7 @@ export class Auth {
   private jwtToken: string | null;
   public lastLogin: Date | null;
   public loginAttempts: number;
-  private userId: string;
+  public userId: string;
 
   constructor(
     { id, email, passwordHash, emailVerified, jwtToken, lastLogin, loginAttempts, userId }: AuthModel
@@ -62,9 +62,18 @@ export class Auth {
     const auth = await AuthService.updateAuth(id, updatedFields);
     return auth;
   }
+  
+  
 
   static async get(authId: string): Promise<Auth | null> {
     const auth = await AuthService.getAuth(authId);
+
+    if (!auth) return null;
+    return auth;
+  }
+
+  static async getByEmail(email: string): Promise<Auth | null> {
+    const auth = await AuthService.getAuthByEmail(email);
 
     if (!auth) return null;
     return auth;

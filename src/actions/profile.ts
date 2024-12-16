@@ -14,6 +14,15 @@ export async function register(formData: FormData): Promise<string> {
   return auth.id;
 }
 
+// get user
+export async function getUser(): Promise<User | null> {
+  const token = await getCookie("token");
+  if (!token) return null;
+  const userId = await Auth.session(token);
+  if (!userId) return null;
+  return await User.getById(userId);
+}
+
 export async function updateProfile(formData: FormData): Promise<void> {
   const token = await getCookie("token");
   if (!token) return;
