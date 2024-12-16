@@ -103,6 +103,65 @@ class Recovery {
     + sendToken(string email): void
 }
 
+class UserService {
+    + getUserById(UUID id): User
+    + createUser(string name, string cpf): User
+    + updateUser(UUID id, object params): void
+}
+
+class AuthService {
+    + getAuth(UUID userId): Auth
+    + getAuthByEmail(string email): Auth
+    + createCredentials(UUID userId, string email, string password): Auth
+    + verifyCredentials(string password, string passwordHash): bool
+    + updateAuth(UUID userId, object updatedFields): Auth
+    + createJwtToken(UUID authId): string
+    + verifySession(string token): string
+    + hashPassword(string password): string
+}
+
+class GoalService {
+    + createGoal(UUID userId, object goalData): Goal
+    + getGoals(UUID userId): array<Goal>
+    + getGoalById(UUID id): Goal
+    + updateGoal(UUID id, object updatedFields): Goal
+    + deleteGoal(UUID id): void
+}
+
+class TransactionService {
+    + createTransaction(UUID historyId, object transactionData): Transaction
+    + getTransactions(UUID historyId): array<Transaction>
+    + getFilteredTransactions(date startDate, date endDate): array<Transaction>
+    + updateTransaction(UUID id, object updatedFields): Transaction
+    + deleteTransaction(UUID id): void
+}
+
+class BudgetService {
+    + createBudget(UUID userId, object budgetData): Budget
+    + getBudget(UUID userId): Budget
+    + updateBudget(UUID id, object updatedFields): Budget
+}
+
+class PreferencesService {
+    + createPreferences(UUID userId, object preferencesData): Preferences
+    + getPreferences(UUID userId): Preferences
+    + updatePreferences(UUID id, object updatedFields): Preferences
+}
+
+class HistoryService {
+    + createHistory(UUID userId): History
+    + getHistoryByUserId(UUID userId): History
+    + updateHistory(UUID id, object updatedFields): History
+}
+
+class RecoveryService {
+    + createRecoveryToken(UUID userId): Recovery
+    + setRecoveryToken(UUID userId): Recovery
+    + verifyRecoveryToken(UUID userId, string recoveryToken): boolean
+    + sendVerifyEmail(string email, string token): void
+    + sendPasswordResetEmail(string email, string token): void
+}
+
 User o-- Auth : "1"
 User "1" --> "0..*" Goal : manages
 User "1" o-- "0..1" Budget : has
@@ -111,3 +170,14 @@ User "1" -- "0..1" Recovery : can request
 Preferences -- User : "0..1" uses
 Goal "0..*" <-- "0..*" Transaction : tracks
 History "1" -- "0..*" Transaction : logs
+
+User *-- UserService
+Auth *-- AuthService
+Goal *-- GoalService
+Transaction *-- TransactionService
+Budget *-- BudgetService
+Preferences *-- PreferencesService
+History *-- HistoryService
+Recovery *-- RecoveryService
+
+@enduml

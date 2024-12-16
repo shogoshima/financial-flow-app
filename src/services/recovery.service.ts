@@ -54,13 +54,4 @@ export class RecoveryService {
       html: `<p>${token}</p>`
     });
   }
-
-  static async sendPasswordChangedEmail(email: string): Promise<void> {
-    resend.emails.send({
-      from: 'financial@flow.dev',
-      to: email,
-      subject: 'Your password was changed',
-      html: `<p>Your password was changed successfully!</p>`
-    });
-  }
 }
