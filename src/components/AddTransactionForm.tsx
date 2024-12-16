@@ -15,16 +15,7 @@ export default function AddTransactionForm({ onAddTransaction, token }: AddTrans
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // const formData = new FormData();
-    // formData.append('type', type);
-    // formData.append('amount', amount);
-    // formData.append('date', date);
-    // formData.append('description', description);
-    // formData.append('category', category);
 
-    // get user id from token
-    // const token = getCookie('token');
-    
 
     const queryParams = new URLSearchParams({
         type,
@@ -56,55 +47,69 @@ export default function AddTransactionForm({ onAddTransaction, token }: AddTrans
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto border rounded-lg p-4 shadow-md bg-gray-700">
       <div>
-        <label htmlFor="type">Type:</label>
-        <select id="type" value={type} onChange={(e) => setType(e.target.value)}>
+        <label htmlFor="type" className="block text-sm font-medium text-gray-300">Type:</label>
+        <select
+          id="type"
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          className="mt-1 block w-full border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-800 text-white"
+        >
           <option value="income">Income</option>
           <option value="expense">Expense</option>
         </select>
       </div>
       <div>
-        <label htmlFor="amount">Amount:</label>
+        <label htmlFor="amount" className="block text-sm font-medium text-gray-300">Amount:</label>
         <input
           type="number"
           id="amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           required
+          className="mt-1 block w-full border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-800 text-white"
         />
       </div>
       <div>
-        <label htmlFor="date">Date:</label>
+        <label htmlFor="date" className="block text-sm font-medium text-gray-300">Date:</label>
         <input
           type="date"
           id="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
           required
+          className="mt-1 block w-full border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-800 text-white"
         />
       </div>
       <div>
-        <label htmlFor="description">Description:</label>
+        <label htmlFor="description" className="block text-sm font-medium text-gray-300">Description:</label>
         <input
           type="text"
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
+          className="mt-1 block w-full border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-800 text-white"
         />
       </div>
       <div>
-        <label htmlFor="category">Category:</label>
+        <label htmlFor="category" className="block text-sm font-medium text-gray-300">Category:</label>
         <input
           type="text"
           id="category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           required
+          className="mt-1 block w-full border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-800 text-white"
         />
       </div>
-      <button type="submit">Add Transaction</button>
+      <button
+        type="submit"
+        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        Add Transaction
+      </button>
     </form>
   );
 }

@@ -20,9 +20,20 @@ export async function addTransaction(formData: FormData): Promise<void> {
   if (!history) return;
 
   console.log("[data.ts] found history")
+  let transactionType = ""
+  switch (formData.get("type")) {
+    case "income":
+      transactionType = TransactionType.INCOME
+      break;
+    case "expense":
+      transactionType = TransactionType.EXPENSE
+      break;
+    default:
+      transactionType = TransactionType.EXPENSE
+  }
 
   await Transaction.create(history.id, {
-    type: formData.get("type") as TransactionType,
+    type: transactionType as TransactionType,
     amount: Number(formData.get("amount")),
     date: new Date(formData.get("date") as string),
     description: formData.get("description") as string,
@@ -39,11 +50,6 @@ export async function addTransaction(formData: FormData): Promise<void> {
 
 // Get all transactions for the user
 export async function getTransactions(token : string): Promise<Transaction[]> {
-  // const token = await getCookie("token");
-  // if (!token) return [];
-  // const token = tokens;
-  // const userId = await Auth.session(token);
-  // if (!userId) return [];
 
   console.log("[data.ts] getting transactions for user w token=", token);
 
