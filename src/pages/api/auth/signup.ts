@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { AuthService } from '@/services/auth.service';
 import { prisma } from '@/lib/prisma';
+import { HistoryService } from '@/services/history.service';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -23,6 +24,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(400).json({ error: 'Failed to create user credentials' });
       return;
     }
+
+    const history = HistoryService.createHistory(user.id);
+    console.log("[signup.ts] created history", history);
 
     const token = AuthService.createJwtToken(auth.id);
     res.status(201).json({ token });

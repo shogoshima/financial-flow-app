@@ -84,9 +84,52 @@ export class History {
   }
 
   // Static Methods
+  static async create(userId : string): Promise<History> {
+    const history = await HistoryService.createHistory(userId);
+
+    console.log("[History] created history", history);
+    return new History(history);
+  }
+
   static async getLastSavedHistory(userId: string): Promise<History | null> {
     const history = await HistoryService.getHistoryByUserId(userId);
     if (!history) return null;
     return history;
+  }
+
+  static async getByUserId(userId: string): Promise<History | null> {
+    const history = await HistoryService.getHistoryByUserId(userId);
+
+    if (!history) return null;
+
+    return new History(history);
+  }
+
+  async getTransactions(): Promise<Transaction[]> {
+    // getting all transactions related to this history id
+    const transactions = await TransactionService.getTransactions(this.id); 
+
+    return transactions.map((transaction) => new Transaction(transaction));
+  }
+
+  async updateTotals(): Promise<void> {
+    const transactions = await this.getTransactions();
+
+    this.totalIncome = transactions
+      .filter((transaction) => transaction.type === TransactionType.INCOME)
+      .reduce((sum, transaction) => sum + transaction.amount, 0);
+
+    this.totalExpenses = transactions
+      .filter((transaction) => transaction.type === TransactionType.EXPENSE)
+      .reduce((sum, transaction) => sum + transaction.amount, 0);
+
+    this.netSavings = this.totalIncome - this.totalExpenses;
+
+    await HistoryService.updateHistory(this.id, {
+      totalIncome: this.totalIncome,
+      totalExpenses: this.totalExpenses,
+      netSavings: this.netSavings,
+    });
+
   }
 }

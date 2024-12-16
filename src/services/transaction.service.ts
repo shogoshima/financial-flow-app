@@ -3,6 +3,7 @@ import prisma from "@/bin/prisma";
 
 export class TransactionService {
   static async createTransaction(historyId: string, transactionData: Omit<TransactionModel, 'id'>): Promise<Transaction> {
+    console.log('[TransactionService] creating transaction', transactionData, "history id", historyId);
     const transaction = await prisma.transaction.create({
       data: {
         ...transactionData,

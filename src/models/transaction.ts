@@ -1,5 +1,6 @@
 import { TransactionService } from "@/services";
 import { History } from "@/models";
+// import { TransactionService } from "@/services";
 
 export enum TransactionType {
   INVESTMENT = 'INVESTMENT',
@@ -34,6 +35,12 @@ export class Transaction {
     this.date = date;
     this.description = description;
     this.category = category;
+  }
+
+  static async create(historyId: string, data: Omit<TransactionModel, "id" | "historyId">): Promise<Transaction> {
+    const transaction = await TransactionService.createTransaction(historyId, data);
+
+    return new Transaction(transaction);
   }
 
   getDetails() {

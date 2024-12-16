@@ -5,11 +5,16 @@ import { getCookie } from '@/bin/cookie';
 import { getUser } from '@/actions/profile';
 import { AuthService } from '@/services/auth.service';
 // import { UserService } from '@/services/user.service';
+import { AddTransactionForm } from '@/components';
+// import { getTransactions } from '@/actions/data';
+import { Transaction } from '@/models';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [userIdBd, setUserIdBd] = useState("");
+  const [transactions, setTransactions] = useState<Transaction[]>();
   const router = useRouter();
+  const [token, setToken] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -19,6 +24,8 @@ export default function Dashboard() {
         router.push('/');
         return;
       }
+
+        setToken(token);
 
       console.log("[dashboard.tsx] veryfing token", token);
 
@@ -52,6 +59,46 @@ export default function Dashboard() {
     fetchUser();
   }, [router]);
 
+  useEffect(() => {
+    const token = getCookie('token');
+    if (!token) {
+      router.push('/');
+      return;
+    }
+
+    setToken(token);
+
+    const fetchTransactions = async () => {
+        const queryParams = new URLSearchParams({
+            token,
+        });
+
+      const response = await fetch(`/api/transactions?${queryParams.toString()}`);
+      if (response.ok) {
+        const transactionsData = await response.json();
+        setTransactions(transactionsData);
+      } else {
+        console.error('Failed to fetch transactions:', response.statusText);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
+  const handleAddTransaction = async () => {
+    const queryParams = new URLSearchParams({
+        token,
+    });
+
+    const response = await fetch(`/api/transactions?${queryParams.toString()}`);
+    if (response.ok) {
+      const transactionsData = await response.json();
+      setTransactions(transactionsData);
+    } else {
+      console.error('Failed to fetch transactions:', response.statusText);
+    }
+  };
+
   if (!user) {
     return <div>Loading...</div>;
   }
@@ -67,6 +114,17 @@ export default function Dashboard() {
           <li><Link href="/transactions">Transactions</Link></li>
         </ul>
       </nav>
+
+      <h2>Add Transaction</h2>
+      <AddTransactionForm onAddTransaction={handleAddTransaction} token={token} />
+      <h2>Transactions</h2>
+      <ul>
+        {transactions?.map((transaction) => (
+          <li key={transaction.id}>
+            - {transaction.date}: {transaction.type} - {transaction.amount} ({transaction.category}) - {transaction.description}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

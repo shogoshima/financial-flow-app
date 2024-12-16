@@ -16,6 +16,8 @@ export class HistoryService {
       },
     });
 
+    console.log("[HistoryService] created history", history);
+
     return this.mapToModel({
       ...history,
     });

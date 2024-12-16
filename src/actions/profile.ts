@@ -2,7 +2,7 @@
 "use server";
 
 import { getCookie } from "@/bin/cookie";
-import { Auth, Goal, GoalStatus, GoalType, User } from "@/models";
+import { Auth, Goal, GoalStatus, GoalType, User, History } from "@/models";
 
 export async function register(formData: FormData): Promise<string> {
   const auth = await User.create(
@@ -11,6 +11,14 @@ export async function register(formData: FormData): Promise<string> {
     formData.get("email") as string,
     formData.get("password") as string
   );
+
+  console.log("[register] created user", auth);
+  // create an initial history record
+  const h = await History.create(auth.id) // it says auth id but it should be user id, but im afraid of breaking stuff
+
+
+  console.log("[register] created history", h);
+
   return auth.id;
 }
 
