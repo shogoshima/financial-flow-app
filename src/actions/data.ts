@@ -13,9 +13,6 @@ export async function addTransaction(formData: FormData): Promise<void> {
 
   console.log("[data.ts] found user token")
 
-  // const userId = await Auth.session(token);
-  // if (!userId) return;
-
   const history = await History.getByUserId(token);
   if (!history) return;
 
@@ -42,7 +39,7 @@ export async function addTransaction(formData: FormData): Promise<void> {
 
   console.log("[data.ts] created transaction")
 
-  // Update history totals
+  // history totals
   await history.updateTotals();
 
   console.log("[data.ts] updated totals")

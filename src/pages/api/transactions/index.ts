@@ -6,15 +6,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     try {
       const { type, amount, date, description, category, token } = req.query;
-      // console.log("[transaction/index.ts] received post request with ", req.body);
-
-      // console.log("[transaction/index.ts] fields", req.body["amount"]);
-      // const formData = new FormData();
-      // formData.append('type', req.body.type);
-      // formData.append('amount', req.body.amount);
-      // formData.append('date', req.body.date);
-      // formData.append('description', req.body.description);
-      // formData.append('category', req.body.category);
+     
 
       const formData = new FormData();
       formData.append('type', type as string);
@@ -24,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       formData.append('category', category as string);
       formData.append('token', token as string);
 
-      console.log("[transaction/index.ts] aaaaaaadding transaction", formData);
+      console.log("[transaction/index.ts] adding transaction", formData);
 
       await addTransaction(formData);
       res.status(200).json({ message: 'Transaction added successfully' });

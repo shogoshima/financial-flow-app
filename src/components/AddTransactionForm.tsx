@@ -16,7 +16,6 @@ export default function AddTransactionForm({ onAddTransaction, token }: AddTrans
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-
     const queryParams = new URLSearchParams({
         type,
         amount,
@@ -25,12 +24,10 @@ export default function AddTransactionForm({ onAddTransaction, token }: AddTrans
         category,
         token,
     });
-
     console.log("[AddTransactionForm.tsx] adding transaction", amount, date, description, category);
 
     const response = await fetch(`/api/transactions?${queryParams.toString()}`, {
       method: 'POST',
-    //   body: formData,
     });
 
     if (response.ok) {
