@@ -87,8 +87,11 @@ export class AuthService {
   }
 
   static  createJwtToken(authId: string): string {
+    // note: for some reason nextjs hates jwt libraries, so we are using a mock
+    // since its not a production project, we can just save the authId as the token
+
     // const secret =  "super-cool-secret-key";
-    // const expiresIn = "7d"; // Example: 7 days
+    // const expiresIn = "7d"; 
     const payload = { authId : authId };
     // const token = jwt.sign(payload, jwtsecret);
 
@@ -114,6 +117,7 @@ export class AuthService {
         throw new Error("No token provided");
       };
 
+      // same stuff here:
       // const verifier = createVerifier({ key: jwtsecret });
       // const typed = verifier(token) as CustomJwtPayload;
       
